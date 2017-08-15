@@ -20,3 +20,7 @@ semicolon
 0
 Shift+q
 ```
+
+#### Todo
+* add option to show the command along with the keybind
+* make output better
