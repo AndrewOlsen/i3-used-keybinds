@@ -1,20 +1,26 @@
 #!/usr/bin/env python
 
 import argparse
+from tabulate import tabulate
 from pathlib import Path
 import re
 import sys
 
-super_binds = []
-meta_binds = []
+binds = []
 args = ''
+
+
+def cat(list):
+    return ' '.join(list)
 
 
 def get_arg():
     global args
     parser = argparse.ArgumentParser(
             description='Find all used keybinds in i3.')
-    parser.add_argument('-s', '--search', help='Search for a specific key')
+    parser.add_argument(
+            '-k', '--keybind', help='Search for a specific keybind')
+    parser.add_argument('-c', '--command', help='Search for a command')
     args = parser.parse_args()
 
 
@@ -71,53 +77,69 @@ def parse(config):
                         if mod:
                             if '--' in words[1]:
                                 if meta:
-                                    meta_binds.append(
-                                            words[2].replace(mod+'+', ""))
+                                    key = words[2].replace(mod+'+', "")
+                                    cmd = cat(words[3:])
+                                    l = [key, "Mod1", cmd]
+                                    binds.append(l)
                                 else:
-                                    super_binds.append(
-                                            words[2].replace(mod+'+', ""))
+                                    key = words[2].replace(mod+'+', "")
+                                    cmd = cat(words[3:])
+                                    l = [key, "Mod4", cmd]
+                                    binds.append(l)
                             else:
                                 if meta:
-                                    meta_binds.append(
-                                            words[1].replace(mod+'+', ""))
+                                    key = words[1].replace(mod+'+', "")
+                                    cmd = cat(words[2:])
+                                    l = [key, "Mod1", cmd]
+                                    binds.append(l)
                                 else:
-                                    super_binds.append(
-                                            words[1].replace(mod+'+', ""))
+                                    key = words[1].replace(mod+'+', "")
+                                    cmd = cat(words[2:])
+                                    l = [key, "Mod4", cmd]
+                                    binds.append(l)
+
                         else:
                             if 'Mod1' in words:
-                                meta_binds.append(words[1].replace('Mod1', ""))
+                                key = words[1].replace('Mod1', "")
+                                cmd = cat(words[2:])
+                                l = [key, "Mod1", cmd]
+                                binds.append(l)
                             elif 'Mod4' in words:
-                                super_binds.append(
-                                        words[1].replace('Mod4', ""))
+                                key = words[1].replace('Mod4', "")
+                                cmd = cat(words[2:])
+                                l = [key, "Mod4", cmd]
+                                binds.append(l)
 
 
-def output(search=""):
-    if super_binds:
-        print('----------SUPER BINDS IN USE----------')
-        super_binds.sort()
-        for s in super_binds:
-            if search:
-                if search in s.lower():
-                    print(s)
+def output(keybind="", command=""):
+    headers = ['Keybind', 'Modifier', 'Command']
+    t_data = []
+    if binds:
+        binds.sort()
+        for l in binds:
+            if keybind:
+                if keybind in l[0].lower():
+                    t_data.append(l)
+                    # print(cat(l))
+            elif command:
+                if command in l[2].lower():
+                    t_data.append(l)
+                    # print(cat(l))
             else:
-                print(s)
-    if meta_binds:
-        print('---------META BINDS IN USE---------')
-        meta_binds.sort()
-        for m in meta_binds:
-            if search:
-                if search in s.lower():
-                    print(s)
-            else:
-                print(s)
+                t_data.append(l)
+                # print(cat(l))
+        table = tabulate(t_data, headers=headers)
+        print(table)
 
 
 def main():
     get_arg()
     config = find_config()
     parse(config)
-    search = args.search
-    output(search)
+    keybind = args.keybind
+    command = args.command
+    output(keybind, command)
 
 
-main()
+if __name__ == '__main__':
+    main()
