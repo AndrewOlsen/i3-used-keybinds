@@ -86,7 +86,8 @@ def find_config():
             print('Found .i3/config!')
         return config
     else:
-        print('File not found. Trying another directory.')
+        if args.verbose:
+            print('File not found. Trying another directory.')
         config = Path(dotconfig)
         if (config.is_file()):
             if args.verbose:
