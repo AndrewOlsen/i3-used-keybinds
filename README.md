@@ -3,7 +3,9 @@ Show i3 keybinds already in use.
 
 Simple python script that parses through an i3 config file to find assigned keybinds. This makes it easier for the user to assign new keybinds in i3 without having to grep the config file.
 
-Currently requires tabulate to do table printing.
+Requires terminaltables for pretty output.
+
+`pip install terminaltables`
 
 ### Features
 
@@ -16,17 +18,7 @@ Currently requires tabulate to do table printing.
 
 The script spits out the keybinds in the same format as i3, in alphabetical order:
 
-```
-Keybind               Modifier    Command
---------------------  ----------  ---------------
-Control+l             Mod1        /usr/bin/i3lock
-Up                    Mod4        move up
-semicolon             Mod1        exec --no-startup-id weechat
-0                     Mod4        workspace 10
-Shift+q               Mod4        kill
-```
+![screenshot](screenshot.png?raw=true "Example Output")
 
 #### Todo
-* make output better (in progress)
-  * testing other python table modules
 * gtk version
