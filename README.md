@@ -9,8 +9,8 @@ Requires terminaltables for pretty output.
 
 ### Features
 
-* Trys, albeit not very hard, to find an i3 config automatically.
-* If keybinds are set using a variable inplace of Mod1 or Mod4, e.g. `set $mod Mod4`, it will still work. Hopefully.
+* Tries, albeit not very hard, to find an i3 config automatically.
+* If keybinds are set using a variable in place of Mod1 or Mod4, e.g. `set $mod Mod4`, it will still work. Hopefully.
 * There is a very primitive search function implemented. 
 `i3keybinds.py -k s` will return all keybinds with a 's' in them. This includes Shifts and symbols like minus. If you are looking for `Shift+q` you must add the `+`. 
 `i3keybinds.py -c kill` will return all keybinds that execute the command 'kill'.
