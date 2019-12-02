@@ -80,6 +80,7 @@ def find_config():
     homedir = str(Path.home())
     doti3 = homedir + '/.i3/config'
     dotconfig = homedir + '/.config/i3/config'
+    regolithconfig = homedir + '/.config/regolith/i3/config'
     config = Path(doti3)
     if (config.is_file()):
         if args.verbose:
@@ -94,9 +95,18 @@ def find_config():
                 print('Found .config/i3/config!')
             return config
         else:
-            print('No config files found.')
-            print('Please make sure the file is in ~/.i3 or ~/.config')
-            sys.exit(1)
+            if args.verbose:
+                print('File not found. Trying another directory.')
+            config = Path(regolithconfig)
+
+            if (config.is_file()):
+                if args.verbose:
+                    print('Found .config/regolith/i3/config!')
+                return config
+            else:
+                print('No config files found.')
+                print('Please make sure the file is in ~/.i3 or ~/.config')
+                sys.exit(1)
 
 
 def parse(config):
