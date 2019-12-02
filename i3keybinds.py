@@ -80,6 +80,7 @@ def find_config():
     homedir = str(Path.home())
     doti3 = homedir + '/.i3/config'
     dotconfig = homedir + '/.config/i3/config'
+    regolithconfig = homedir + '/.config/regolith/i3/config'
     config = Path(doti3)
     if (config.is_file()):
         if args.verbose:
@@ -94,9 +95,18 @@ def find_config():
                 print('Found .config/i3/config!')
             return config
         else:
-            print('No config files found.')
-            print('Please make sure the file is in ~/.i3 or ~/.config')
-            sys.exit(1)
+            if args.verbose:
+                print('File not found. Trying another directory.')
+            config = Path(regolithconfig)
+
+            if (config.is_file()):
+                if args.verbose:
+                    print('Found .config/regolith/i3/config!')
+                return config
+            else:
+                print('No config files found.')
+                print('Please make sure the file is in ~/.i3 or ~/.config')
+                sys.exit(1)
 
 
 def parse(config):
@@ -148,7 +158,7 @@ def parse(config):
                                     binds.append(l)
                             else:
                                 if meta:
-                                    key = words[1].replace(mod+'+', "")
+                                    key = words[1]
                                     cmd = cat(words[2:])
                                     l = [key, "Mod1", cmd]
                                     binds.append(l)
@@ -170,6 +180,11 @@ def parse(config):
                                 l = [key, "Mod4", cmd]
                                 binds.append(l)
 
+def sortfunc(bind):
+    num_keys = str(len(bind[0].split("+")))
+    length_last = str(len(bind[0].split("+")[-1]))
+    return num_keys + "_" + length_last + "_" + bind[0]
+
 
 def output(keybind="", command=""):
     '''Output the keybinds in a nice table.
@@ -178,7 +193,7 @@ def output(keybind="", command=""):
     headers = ['Keybind', 'Modifier', 'Command']
     t_data = []
     if binds:
-        binds.sort()
+        binds.sort(key = sortfunc)
         for l in binds:
             if keybind:
                 if keybind in l[0].lower():
