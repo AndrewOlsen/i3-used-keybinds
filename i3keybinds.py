@@ -77,49 +77,37 @@ def find_config():
     Exit if not found.
     '''
     homedir = str(Path.home())
-    xdgconfhome = os.getenv('XDG_CONFIG_HOME', homedir + '/.config/')
-    xdgconfdirs = os.getenv('XDG_CONFIG_DIRS', '/etc/xdg/')
+    xdgconfhome = os.getenv('XDG_CONFIG_HOME', homedir + '/.config')
+    xdgconfdirs = os.getenv('XDG_CONFIG_DIRS', '/etc/xdg')
 
     dotconfig = xdgconfhome + '/i3/config'
     doti3 = homedir + '/.i3/config'
     etcxdgi3 = xdgconfdirs + '/i3/config'
     etci3 = '/etc/i3/config'
+    possibledirs = [ dotconfig, doti3, etcxdgi3, etci3 ]
     if args.verbose:
         print('Searching for i3 config file....')
-        print('Looking in {}/i3 ...'.format(xdgconfhome))
-    config = Path(dotconfig)
-    if (config.is_file()):
+    
+    for config in possibledirs:
         if args.verbose:
-            print('Found {}/i3/config!'.format(xdgconfhome))
-        return config
-    else:
-        if args.verbose:
-            print('File not found. Trying another directory.')
-        config = Path(doti3)
-        if (config.is_file()):
+            print('Looking in {} ...'.format(config))
+        configpath = Path(config)
+        if (configpath.is_file()):
             if args.verbose:
-                print('Found .i3/config!')
-            return config
+                print('Found {}!'.format(config))
+            return configpath
         else:
-            if args.verbose:
+            if (args.verbose):
                 print('File not found. Trying another directory.')
-            config = Path(etcxdgi3)
-            if (config.is_file()):
-                if args.verbose:
-                    print('Found {}/i3/config!'.format(xdgconfdirs))
-                return config
-            else:
-                if args.verbose:
-                    print('File not found. Trying another directory.')
-                config = Path(etci3)
-                if (config.is_file()):
-                    if args.verbose:
-                        print('Found {}/i3/config!'.format(xdgconfdirs))
-                    return config
-                else:
-                    print('No config files found.')
-                    print('Please make sure the file is in ~/.i3 or ~/.config')
-                    sys.exit(1)
+
+    print('No config files found.')
+    print(
+        '''Please make sure the file is in one of thoes places:
+        {}, {},
+        {}, {}
+        '''.format(possibledirs[0], possibledirs[1], possibledirs[2], possibledirs[3])
+    )
+    sys.exit(1)
 
 
 def parse(config):
