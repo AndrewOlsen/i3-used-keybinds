@@ -4,6 +4,7 @@ from terminaltables import SingleTable
 from pathlib import Path
 import re
 import sys
+import os
 
 binds = []
 args = ''
@@ -71,32 +72,54 @@ def fix_table(table):
 
 def find_config():
     '''Find the i3 config file in either
-    ${HOME}/.i3/config or ${HOME}/.config/i3
+    ${XDG_CONFIG_HOME}/i3/config, ${HOME}/.i3/config,
+    ${XDG_CONFIG_DIRS}/i3/config or /etc/i3/config
     Exit if not found.
     '''
+    homedir = str(Path.home())
+    xdgconfhome = os.getenv('XDG_CONFIG_HOME', homedir + '/.config/')
+    xdgconfdirs = os.getenv('XDG_CONFIG_DIRS', '/etc/xdg/')
+
+    dotconfig = xdgconfhome + '/i3/config'
+    doti3 = homedir + '/.i3/config'
+    etcxdgi3 = xdgconfdirs + '/i3/config'
+    etci3 = '/etc/i3/config'
     if args.verbose:
         print('Searching for i3 config file....')
-        print('Looking in .i3 ...')
-    homedir = str(Path.home())
-    doti3 = homedir + '/.i3/config'
-    dotconfig = homedir + '/.config/i3/config'
-    config = Path(doti3)
+        print('Looking in {}/i3 ...'.format(xdgconfhome))
+    config = Path(dotconfig)
     if (config.is_file()):
         if args.verbose:
-            print('Found .i3/config!')
+            print('Found {}/i3/config!'.format(xdgconfhome))
         return config
     else:
         if args.verbose:
             print('File not found. Trying another directory.')
-        config = Path(dotconfig)
+        config = Path(doti3)
         if (config.is_file()):
             if args.verbose:
-                print('Found .config/i3/config!')
+                print('Found .i3/config!')
             return config
         else:
-            print('No config files found.')
-            print('Please make sure the file is in ~/.i3 or ~/.config')
-            sys.exit(1)
+            if args.verbose:
+                print('File not found. Trying another directory.')
+            config = Path(etcxdgi3)
+            if (config.is_file()):
+                if args.verbose:
+                    print('Found {}/i3/config!'.format(xdgconfdirs))
+                return config
+            else:
+                if args.verbose:
+                    print('File not found. Trying another directory.')
+                config = Path(etci3)
+                if (config.is_file()):
+                    if args.verbose:
+                        print('Found {}/i3/config!'.format(xdgconfdirs))
+                    return config
+                else:
+                    print('No config files found.')
+                    print('Please make sure the file is in ~/.i3 or ~/.config')
+                    sys.exit(1)
 
 
 def parse(config):
