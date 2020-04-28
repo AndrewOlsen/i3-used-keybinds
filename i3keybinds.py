@@ -102,7 +102,7 @@ def find_config():
 
     print('No config files found.')
     print(
-        '''Please make sure the file is in one of thoes places:
+        '''Please make sure the file is in one of thees places:
         {}, {},
         {}, {}
         '''.format(possibledirs[0], possibledirs[1], possibledirs[2], possibledirs[3])
